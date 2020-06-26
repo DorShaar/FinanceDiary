@@ -2,7 +2,6 @@
 using CsvHelper.Configuration;
 using FinanceDiary.App;
 using FinanceDiary.Domain.CashRegisters;
-using FinanceDiary.Domain.FinacneOperations;
 using FinanceDiary.Domain.FinanceOperations;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,6 +15,7 @@ namespace FinanceDiary.Infra
 {
     public class FinanceDiaryManager : IFinanceDiaryManager
     {
+        private readonly IOperationsFactory mOperationsFactory;
         private readonly ILogger<FinanceDiaryManager> mLogger;
 
         private const string DefaultAccountName = "Default Account";
@@ -24,13 +24,15 @@ namespace FinanceDiary.Infra
         private readonly List<FinanceOperation> mFinanceOperations = new List<FinanceOperation>();
         private readonly List<NeutralOperation> mNeutralOperations = new List<NeutralOperation>();
 
-        public FinanceDiaryManager(ILogger<FinanceDiaryManager> logger)
+        public FinanceDiaryManager(
+            IOperationsFactory operationsFactory, ILogger<FinanceDiaryManager> logger)
         {
             mCashRegisters = new HashSet<CashRegister>(new CashRegisterComparer())
             {
                 DefaultCacheRegister
             };
 
+            mOperationsFactory = operationsFactory;
             mLogger = logger;
         }
 
@@ -50,8 +52,8 @@ namespace FinanceDiary.Infra
         {
             try
             {
-                FinanceOperation financeOperation =
-                    FinanceOperation.Create(date, operationType, amount, operationKind, reason);
+                FinanceOperation financeOperation = mOperationsFactory.CreateFinanceOperation(
+                    date, operationType, amount, operationKind, reason);
 
                 UpdateDefaultCashRegister(financeOperation);
 
@@ -109,7 +111,7 @@ namespace FinanceDiary.Infra
 
             try
             {
-                NeutralOperation neutralOperation = NeutralOperation.Create(
+                NeutralOperation neutralOperation = mOperationsFactory.CreateNeutralOperation(
                     date, amount, sourceCashRegister, destinationCashRegister, reason);
 
                 UpdateCashRegisters(neutralOperation);

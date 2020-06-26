@@ -1,13 +1,9 @@
-﻿using FinanceDiary.Domain.FinanceOperations;
-using FinanceDiary.Domain.IdGenerator;
-using System;
+﻿using System;
 
-namespace FinanceDiary.Domain.FinacneOperations
+namespace FinanceDiary.Domain.FinanceOperations
 {
-    public class FinanceOperation : IFinanceOperation
+    public class FinanceOperation
     {
-        private static IIdGenerator mIdGenerator;
-
         public string Id { get; }
         public DateTime Date { get; private set; }
         public OperationType OperationType { get; private set; }
@@ -15,34 +11,20 @@ namespace FinanceDiary.Domain.FinacneOperations
         public OperationKind OperationKind { get; private set; }
         public string Reason { get; private set; }
 
-        internal FinanceOperation(IIdGenerator idGenerator)
-        {
-            mIdGenerator = idGenerator;
-        }
-
-        private FinanceOperation(
+        internal FinanceOperation(
+            string id,
             string date,
             OperationType operationType,
             int amount,
             OperationKind operationKind,
             string reason)
         {
-            //Id = mIdGenerator.GenerateId();
+            Id = id;
             ValidateAndSetDate(date);
             OperationType = operationType;
             ValidateAndSetAmount(amount);
             OperationKind = operationKind;
             ValidateAndSetReason(reason);
-        }
-
-        public static FinanceOperation Create(
-            string date,
-            OperationType operationType, 
-            int amount, 
-            OperationKind operationKind,
-            string reason)
-        {
-            return new FinanceOperation(date, operationType, amount, operationKind, reason);
         }
 
         private void ValidateAndSetDate(string date)

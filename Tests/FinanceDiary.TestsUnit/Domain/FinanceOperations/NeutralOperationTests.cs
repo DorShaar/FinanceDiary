@@ -1,5 +1,7 @@
-﻿using FinanceDiary.Domain.CashRegisters;
+﻿using FakeItEasy;
+using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.FinanceOperations;
+using FinanceDiary.Domain.IdGenerators;
 using System;
 using Xunit;
 
@@ -7,6 +9,16 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
 {
     public class NeutralOperationTests
     {
+        private readonly IOperationsFactory mOperationsFactory;
+
+        public NeutralOperationTests()
+        {
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            mOperationsFactory = new OperationsFactory(idGenerator);
+        }
+
         [Fact]
         public void Ctor_ValidParametersDateFormat_CorrectParametrs()
         {
@@ -15,7 +27,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
             CashRegister cashRegister2 = new CashRegister("cach_register2");
             string reason = "reason";
 
-            NeutralOperation neutralOperation = NeutralOperation.Create("20/01/1992",
+            NeutralOperation neutralOperation = mOperationsFactory.CreateNeutralOperation("20/01/1992",
                 30,
                 cashRegister1,
                 cashRegister2,
@@ -34,7 +46,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [Fact]
         public void Ctor_InvalidDate_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateNeutralOperation(
                 "32/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register2"), "reason"));
         }
 
@@ -43,14 +55,14 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [InlineData(-20)]
         public void Ctor_InvalidAmount_ThrowsArgumentException(int amount)
         {
-            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateNeutralOperation(
                 "26/01/1992", amount, new CashRegister("cach_register1"), new CashRegister("cach_register2"), "reason"));
         }
 
         [Fact]
         public void Ctor_InvalidSourceAndDestinationCachRegisters_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateNeutralOperation(
                  "26/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register1"), "reason"));
         }
 
@@ -59,7 +71,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [InlineData(null)]
         public void Ctor_InvalidReason_ThrowsArgumentException(string reason)
         {
-            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateNeutralOperation(
                  "26/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register2"), reason));
         }
     }

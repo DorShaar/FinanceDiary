@@ -1,6 +1,7 @@
-﻿using FinanceDiary.Domain.CashRegisters;
-using FinanceDiary.Domain.FinacneOperations;
+﻿using FakeItEasy;
+using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.FinanceOperations;
+using FinanceDiary.Domain.IdGenerators;
 using FinanceDiary.Infra;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Generic;
@@ -16,8 +17,8 @@ namespace FinanceDiary.TestsUnit.Infra
         [Fact]
         public void Ctor_HasDefaultAccount()
         {
-            FinanceDiaryManager financeDiaryManager = 
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
 
             IEnumerable<CashRegister> cashRegisters = financeDiaryManager.GetAllCashRegisters();
             Assert.Equal("Default Account", cashRegisters.First().Name);
@@ -26,8 +27,8 @@ namespace FinanceDiary.TestsUnit.Infra
         [Fact]
         public void AddCashRegister_CashRegisterAlreadyExists_DoesNotAdd()
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
             Assert.False(financeDiaryManager.AddCashRegister("Default Account"));
@@ -38,8 +39,8 @@ namespace FinanceDiary.TestsUnit.Infra
         [Fact]
         public void AddCashRegister_CashRegisterNotExists_CashRegisterAdded()
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                 A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
             Assert.True(financeDiaryManager.AddCashRegister("another new account"));
@@ -54,8 +55,13 @@ namespace FinanceDiary.TestsUnit.Infra
         public void AddFinanceOperation_InvalidFinancialOperation_FinancialOperationNotAdded(
             string date, OperationType operationType, int amount, OperationKind operationKind, string reason)
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.False(financeDiaryManager.AddFinanceOperation(
                 date, operationType, amount, operationKind, reason));
@@ -66,8 +72,13 @@ namespace FinanceDiary.TestsUnit.Infra
         public void AddFinanceOperation_ValidFinancialOperation_FinancialOperationAdded(
             string date, OperationType operationType, int amount, OperationKind operationKind, string reason)
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.True(financeDiaryManager.AddFinanceOperation(
                 date, operationType, amount, operationKind, reason));
@@ -83,8 +94,13 @@ namespace FinanceDiary.TestsUnit.Infra
         public void AddNeutralOperation_InvalidNeutralOperation_NeutralOperationNotAdded(
             string date, int amount, string sourceCashRegisterName, string destinationCashRegisterName, string reason)
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
 
             financeDiaryManager.AddCashRegister("cash1");
             financeDiaryManager.AddCashRegister("cash2");
@@ -104,8 +120,13 @@ namespace FinanceDiary.TestsUnit.Infra
         public void AddNeutralOperation_ValidNeutralOperation_NeutralOperationAdded(
             string date, int amount, string sourceCashRegisterName, string destinationCashRegisterName, string reason)
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
 
             financeDiaryManager.AddCashRegister("cash1");
             financeDiaryManager.AddCashRegister("cash2");
@@ -117,10 +138,15 @@ namespace FinanceDiary.TestsUnit.Infra
         [Fact]
         public async Task SaveToCsv_Test()
         {
-            FinanceDiaryManager financeDiaryManager =
-                new FinanceDiaryManager(NullLogger<FinanceDiaryManager>.Instance);
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
 
-            FinanceOperation expectedFinanceOperation = FinanceOperation.Create(
+            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+
+            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
+                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+
+            FinanceOperation expectedFinanceOperation = operationsFactory.CreateFinanceOperation(
                 "24/06/2020", OperationType.Withdraw, 3000, OperationKind.CreditCard, "testing");
 
             financeDiaryManager.AddFinanceOperation(

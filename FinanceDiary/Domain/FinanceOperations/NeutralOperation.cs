@@ -1,13 +1,10 @@
 ﻿using FinanceDiary.Domain.CashRegisters;
-using FinanceDiary.Domain.IdGenerator;
 using System;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
-    public class NeutralOperation : INeutralOperation
+    public class NeutralOperation
     {
-        private static IIdGenerator mIdGenerator;
-
         public string Id { get; }
         public DateTime Date { get; private set; }
         public int Amount { get; private set; }
@@ -15,33 +12,19 @@ namespace FinanceDiary.Domain.FinanceOperations
         public CashRegister DestinationCashRegister { get; private set; }
         public string Reason { get; private set; }
 
-        public NeutralOperation(IIdGenerator idGenerator)
-        {
-            mIdGenerator = idGenerator;
-        }
-
-        private NeutralOperation(
+        internal NeutralOperation(
+            string id,
             string date,
             int amount,
             CashRegister sourceCashRegister,
             CashRegister destinationCashRegister,
             string reason)
         {
-            //Id = mIdGenerator.GenerateId();
+            Id = id;
             ValidateAndSetDate(date);
             ValidateAndSetAmount(amount);
             ValidateAndSetCashRegisters(sourceCashRegister, destinationCashRegister);
             ValidateAndSetReason(reason);
-        }
-
-        public static NeutralOperation Create(
-            string date,
-            int amount,
-            CashRegister sourceCashRegister,
-            CashRegister destinationCashRegister,
-            string reason)
-        {
-            return new NeutralOperation(date, amount, sourceCashRegister, destinationCashRegister, reason);
         }
 
         private void ValidateAndSetDate(string date)

@@ -1,5 +1,7 @@
-using FinanceDiary.Domain.FinacneOperations;
+using FakeItEasy;
 using FinanceDiary.Domain.FinanceOperations;
+using FinanceDiary.Domain.IdGenerators;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using Xunit;
 
@@ -7,6 +9,16 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
 {
     public class FinanceOperationTests
     {
+        private readonly IOperationsFactory mOperationsFactory;
+
+        public FinanceOperationTests()
+        {
+            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
+            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+
+            mOperationsFactory = new OperationsFactory(idGenerator);
+        }
+
         [Fact]
         public void Ctor_ValidParametersDateFormat_CorrectParametrs()
         {
@@ -15,7 +27,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
             OperationKind operationKind = OperationKind.Family;
             string reason = "reason";
 
-            FinanceOperation financeOperation = FinanceOperation.Create("20/01/1992",
+            FinanceOperation financeOperation = mOperationsFactory.CreateFinanceOperation("20/01/1992",
                 operationType,
                 amount,
                 operationKind,
@@ -34,7 +46,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [Fact]
         public void Ctor_InvalidDate_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateFinanceOperation(
                 "32/01/1992", OperationType.Deposit, 30, OperationKind.Commission, "reason"));
         }
 
@@ -43,7 +55,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [InlineData(-20)]
         public void Ctor_InvalidAmount_ThrowsArgumentException(int amount)
         {
-            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateFinanceOperation(
                 "26/01/1992", OperationType.Deposit, amount, OperationKind.Commission, "reason"));
         }
 
@@ -52,7 +64,7 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
         [InlineData(null)]
         public void Ctor_InvalidReason_ThrowsArgumentException(string reason)
         {
-            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
+            Assert.Throws<ArgumentException>(() => mOperationsFactory.CreateFinanceOperation(
                 "26/01/1992", OperationType.Deposit, 30, OperationKind.Commission, reason));
         }
     }
