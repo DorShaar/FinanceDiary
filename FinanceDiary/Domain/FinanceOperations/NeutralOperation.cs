@@ -1,27 +1,47 @@
 ﻿using FinanceDiary.Domain.CashRegisters;
+using FinanceDiary.Domain.IdGenerator;
 using System;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
-    public class NeutralOperation
+    public class NeutralOperation : INeutralOperation
     {
+        private static IIdGenerator mIdGenerator;
+
+        public string Id { get; }
         public DateTime Date { get; private set; }
         public int Amount { get; private set; }
         public CashRegister SourceCashRegister { get; private set; }
         public CashRegister DestinationCashRegister { get; private set; }
         public string Reason { get; private set; }
 
-        public NeutralOperation(
+        public NeutralOperation(IIdGenerator idGenerator)
+        {
+            mIdGenerator = idGenerator;
+        }
+
+        private NeutralOperation(
             string date,
             int amount,
             CashRegister sourceCashRegister,
             CashRegister destinationCashRegister,
             string reason)
         {
+            //Id = mIdGenerator.GenerateId();
             ValidateAndSetDate(date);
             ValidateAndSetAmount(amount);
             ValidateAndSetCashRegisters(sourceCashRegister, destinationCashRegister);
             ValidateAndSetReason(reason);
+        }
+
+        public static NeutralOperation Create(
+            string date,
+            int amount,
+            CashRegister sourceCashRegister,
+            CashRegister destinationCashRegister,
+            string reason)
+        {
+            return new NeutralOperation(date, amount, sourceCashRegister, destinationCashRegister, reason);
         }
 
         private void ValidateAndSetDate(string date)
@@ -40,7 +60,7 @@ namespace FinanceDiary.Domain.FinanceOperations
             Amount = amount;
         }
 
-        private void ValidateAndSetCashRegisters(CashRegister sourceCashRegister, 
+        private void ValidateAndSetCashRegisters(CashRegister sourceCashRegister,
             CashRegister destinationCashRegister)
         {
             if (sourceCashRegister.Name.Equals(destinationCashRegister.Name))

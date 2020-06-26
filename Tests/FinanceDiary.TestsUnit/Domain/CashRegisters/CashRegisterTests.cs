@@ -2,7 +2,7 @@
 using System;
 using Xunit;
 
-namespace FinanceDiary.TestsUnit.CashRegisters
+namespace FinanceDiary.TestsUnit.Domain.CashRegisters
 {
     public class CashRegisterTests
     {

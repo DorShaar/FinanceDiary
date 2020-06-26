@@ -3,7 +3,7 @@ using FinanceDiary.Domain.FinanceOperations;
 using System;
 using Xunit;
 
-namespace FinanceDiary.TestsUnit.FinanceOperations
+namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
 {
     public class FinanceOperationTests
     {
@@ -15,7 +15,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
             OperationKind operationKind = OperationKind.Family;
             string reason = "reason";
 
-            FinanceOperation financeOperation = new FinanceOperation("20/01/1992",
+            FinanceOperation financeOperation = FinanceOperation.Create("20/01/1992",
                 operationType,
                 amount,
                 operationKind,
@@ -34,7 +34,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [Fact]
         public void Ctor_InvalidDate_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => new FinanceOperation(
+            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
                 "32/01/1992", OperationType.Deposit, 30, OperationKind.Commission, "reason"));
         }
 
@@ -43,7 +43,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [InlineData(-20)]
         public void Ctor_InvalidAmount_ThrowsArgumentException(int amount)
         {
-            Assert.Throws<ArgumentException>(() => new FinanceOperation(
+            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
                 "26/01/1992", OperationType.Deposit, amount, OperationKind.Commission, "reason"));
         }
 
@@ -52,7 +52,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [InlineData(null)]
         public void Ctor_InvalidReason_ThrowsArgumentException(string reason)
         {
-            Assert.Throws<ArgumentException>(() => new FinanceOperation(
+            Assert.Throws<ArgumentException>(() => FinanceOperation.Create(
                 "26/01/1992", OperationType.Deposit, 30, OperationKind.Commission, reason));
         }
     }

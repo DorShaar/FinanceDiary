@@ -3,7 +3,7 @@ using FinanceDiary.Domain.FinanceOperations;
 using System;
 using Xunit;
 
-namespace FinanceDiary.TestsUnit.FinanceOperations
+namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
 {
     public class NeutralOperationTests
     {
@@ -15,7 +15,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
             CashRegister cashRegister2 = new CashRegister("cach_register2");
             string reason = "reason";
 
-            NeutralOperation neutralOperation = new NeutralOperation("20/01/1992",
+            NeutralOperation neutralOperation = NeutralOperation.Create("20/01/1992",
                 30,
                 cashRegister1,
                 cashRegister2,
@@ -34,7 +34,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [Fact]
         public void Ctor_InvalidDate_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => new NeutralOperation(
+            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
                 "32/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register2"), "reason"));
         }
 
@@ -43,14 +43,14 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [InlineData(-20)]
         public void Ctor_InvalidAmount_ThrowsArgumentException(int amount)
         {
-            Assert.Throws<ArgumentException>(() => new NeutralOperation(
+            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
                 "26/01/1992", amount, new CashRegister("cach_register1"), new CashRegister("cach_register2"), "reason"));
         }
 
         [Fact]
         public void Ctor_InvalidSourceAndDestinationCachRegisters_ThrowsArgumentException()
         {
-            Assert.Throws<ArgumentException>(() => new NeutralOperation(
+            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
                  "26/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register1"), "reason"));
         }
 
@@ -59,7 +59,7 @@ namespace FinanceDiary.TestsUnit.FinanceOperations
         [InlineData(null)]
         public void Ctor_InvalidReason_ThrowsArgumentException(string reason)
         {
-            Assert.Throws<ArgumentException>(() => new NeutralOperation(
+            Assert.Throws<ArgumentException>(() => NeutralOperation.Create(
                  "26/01/1992", 30, new CashRegister("cach_register1"), new CashRegister("cach_register2"), reason));
         }
     }
