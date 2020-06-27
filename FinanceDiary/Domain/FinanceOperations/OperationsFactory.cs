@@ -1,5 +1,4 @@
-﻿using FinanceDiary.Domain.CashRegisters;
-using FinanceDiary.Domain.IdGenerators;
+﻿using FinanceDiary.Domain.IdGenerators;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -26,8 +25,8 @@ namespace FinanceDiary.Domain.FinanceOperations
         public NeutralOperation CreateNeutralOperation(
             string date, 
             int amount, 
-            CashRegister sourceCashRegister, 
-            CashRegister destinationCashRegister, 
+            string sourceCashRegister, 
+            string destinationCashRegister, 
             string reason)
         {
             string id = mIdGenerator.GenerateId();

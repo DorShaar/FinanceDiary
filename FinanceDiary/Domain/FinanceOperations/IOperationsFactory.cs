@@ -1,6 +1,4 @@
-﻿using FinanceDiary.Domain.CashRegisters;
-
-namespace FinanceDiary.Domain.FinanceOperations
+﻿namespace FinanceDiary.Domain.FinanceOperations
 {
     public interface IOperationsFactory
     {
@@ -14,8 +12,8 @@ namespace FinanceDiary.Domain.FinanceOperations
         NeutralOperation CreateNeutralOperation(
             string date,
             int amount,
-            CashRegister sourceCashRegister,
-            CashRegister destinationCashRegister,
+            string sourceCashRegister,
+            string destinationCashRegister,
             string reason);
     }
 }

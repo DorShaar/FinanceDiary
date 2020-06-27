@@ -1,5 +1,6 @@
 ﻿using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.FinanceOperations;
+using FinanceDiary.Domain.Reports;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,6 +9,8 @@ namespace FinanceDiary.App
     public interface IFinanceDiaryManager
     {
         IEnumerable<CashRegister> GetAllCashRegisters();
+        FinanceReport GetReport();
+
         bool AddCashRegister(string cachRegisterName);
         bool AddFinanceOperation(string date, OperationType operationType, int amount,
             OperationKind operationKind, string reason);

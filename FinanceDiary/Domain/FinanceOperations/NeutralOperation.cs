@@ -1,5 +1,4 @@
-﻿using FinanceDiary.Domain.CashRegisters;
-using System;
+﻿using System;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -8,16 +7,16 @@ namespace FinanceDiary.Domain.FinanceOperations
         public string Id { get; }
         public DateTime Date { get; private set; }
         public int Amount { get; private set; }
-        public CashRegister SourceCashRegister { get; private set; }
-        public CashRegister DestinationCashRegister { get; private set; }
+        public string SourceCashRegister { get; private set; }
+        public string DestinationCashRegister { get; private set; }
         public string Reason { get; private set; }
 
         internal NeutralOperation(
             string id,
             string date,
             int amount,
-            CashRegister sourceCashRegister,
-            CashRegister destinationCashRegister,
+            string sourceCashRegister,
+            string destinationCashRegister,
             string reason)
         {
             Id = id;
@@ -43,10 +42,9 @@ namespace FinanceDiary.Domain.FinanceOperations
             Amount = amount;
         }
 
-        private void ValidateAndSetCashRegisters(CashRegister sourceCashRegister,
-            CashRegister destinationCashRegister)
+        private void ValidateAndSetCashRegisters(string sourceCashRegister, string destinationCashRegister)
         {
-            if (sourceCashRegister.Name.Equals(destinationCashRegister.Name))
+            if (sourceCashRegister.ToLowerInvariant().Equals(destinationCashRegister.ToLowerInvariant()))
                 throw new ArgumentException($"{nameof(sourceCashRegister)} is equal to {nameof(destinationCashRegister)}");
 
             SourceCashRegister = sourceCashRegister;

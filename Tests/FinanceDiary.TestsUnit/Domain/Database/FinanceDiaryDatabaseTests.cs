@@ -97,8 +97,8 @@ namespace FinanceDiary.TestsUnit.Domain.Database
             {
                 List<NeutralOperation> neutralOperations = new List<NeutralOperation>
                 {
-                    mOperationsFactory.CreateNeutralOperation("24/06/2018", 200, new CashRegister("cash1"), new CashRegister("cash2"), "reason"),
-                    mOperationsFactory.CreateNeutralOperation("24/06/2019", 300, new CashRegister("cash1"), new CashRegister("cash2"), "reason"),
+                    mOperationsFactory.CreateNeutralOperation("24/06/2018", 200, "cash1", "cash2", "reason"),
+                    mOperationsFactory.CreateNeutralOperation("24/06/2019", 300, "cash1", "cash2", "reason"),
                 };
 
                 await financeDiaryDatabase.SaveNeutralOperationsToCsv(neutralOperations)

@@ -2,6 +2,7 @@
 using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
+using FinanceDiary.Domain.Reports;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,16 @@ namespace FinanceDiary.Infra
 
             LoadFromDatabase().Wait();
             DefaultCacheRegister = mCashRegisters.First(cash => cash.Name.Equals(DefaultAccountName));
+        }
+
+        public IEnumerable<CashRegister> GetAllCashRegisters()
+        {
+            return mCashRegisters.ToImmutableArray();
+        }
+
+        public FinanceReport GetReport()
+        {
+            return new FinanceReport(mCashRegisters, mFinanceOperations, mNeutralOperations);
         }
 
         public bool AddCashRegister(string cachRegisterName)
@@ -89,32 +100,22 @@ namespace FinanceDiary.Infra
         public bool AddNeutralOperation(string date, int amount, string sourceCashRegisterName,
             string destinationCashRegisterName, string reason)
         {
-            if (!mCashRegisters.TryGetValue(new CashRegister(sourceCashRegisterName),
-                out CashRegister sourceCashRegister))
+            if (sourceCashRegisterName.ToLowerInvariant().Equals(destinationCashRegisterName.ToLowerInvariant()))
             {
-                mLogger.LogWarning($"Cash register {sourceCashRegisterName} does not exist");
-                return false;
-            }
-
-            if (!mCashRegisters.TryGetValue(new CashRegister(destinationCashRegisterName),
-                out CashRegister destinationCashRegister))
-            {
-                mLogger.LogWarning($"Cash register {destinationCashRegisterName} does not exist");
-                return false;
-            }
-
-            if (sourceCashRegister == destinationCashRegister)
-            {
-                mLogger.LogWarning($"Destination and source cash registers are the same: {destinationCashRegister.Name}");
+                mLogger.LogWarning($"Destination and source cash registers are the same: {sourceCashRegisterName}");
                 return false;
             }
 
             try
             {
                 NeutralOperation neutralOperation = mOperationsFactory.CreateNeutralOperation(
-                    date, amount, sourceCashRegister, destinationCashRegister, reason);
+                    date, amount, sourceCashRegisterName, destinationCashRegisterName, reason);
 
-                UpdateCashRegisters(neutralOperation);
+                if (!UpdateCashRegisters(neutralOperation))
+                {
+                    mLogger.LogWarning($"Failed adding finance operation");
+                    return false;
+                }
 
                 mNeutralOperations.Add(neutralOperation);
 
@@ -122,24 +123,35 @@ namespace FinanceDiary.Infra
             }
             catch (ArgumentException ex)
             {
-                mLogger.LogWarning(ex, $"Failed in adding finance operation");
+                mLogger.LogWarning(ex, $"Failed adding finance operation");
                 return false;
             }
         }
 
-        private void UpdateCashRegisters(NeutralOperation neutralOperation)
+        private bool UpdateCashRegisters(NeutralOperation neutralOperation)
         {
+            if (!mCashRegisters.TryGetValue(new CashRegister(neutralOperation.SourceCashRegister),
+                out CashRegister sourceCashRegister))
+            {
+                mLogger.LogWarning($"Cash register {neutralOperation.SourceCashRegister} does not exist");
+                return false;
+            }
+
+            if (!mCashRegisters.TryGetValue(new CashRegister(neutralOperation.DestinationCashRegister),
+                out CashRegister destinationCashRegister))
+            {
+                mLogger.LogWarning($"Cash register {neutralOperation.DestinationCashRegister} does not exist");
+                return false;
+            }
+
             mLogger.LogDebug($"Performing neutral operation id {neutralOperation.Id} of " +
                 $"{neutralOperation.Amount} at {neutralOperation.Date} with reason {neutralOperation.Reason}" +
-                $"from {neutralOperation.SourceCashRegister.Name} to {neutralOperation.DestinationCashRegister.Name}");
+                $"from {neutralOperation.SourceCashRegister} to {neutralOperation.DestinationCashRegister}");
 
-            neutralOperation.SourceCashRegister.Withdraw(neutralOperation.Amount);
-            neutralOperation.DestinationCashRegister.Deposit(neutralOperation.Amount);
-        }
+            sourceCashRegister.Withdraw(neutralOperation.Amount);
+            destinationCashRegister.Deposit(neutralOperation.Amount);
 
-        public IEnumerable<CashRegister> GetAllCashRegisters()
-        {
-            return mCashRegisters.ToImmutableArray();
+            return true;
         }
 
         public async Task SaveToDatabase()
