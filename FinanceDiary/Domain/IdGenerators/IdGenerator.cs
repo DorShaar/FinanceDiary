@@ -18,7 +18,7 @@ namespace FinanceDiary.Domain.IdGenerators
             mLogger = logger;
 
             string idHolderPath = 
-                Path.Combine(Path.GetDirectoryName(configuration.CurrentValue.CsvPath), NextIdHolderName);
+                Path.Combine(Path.GetDirectoryName(configuration.CurrentValue.DatabasePath), NextIdHolderName);
 
             string idString = File.ReadAllText(idHolderPath);
             if (!int.TryParse(idString, out int lastId))

@@ -1,4 +1,5 @@
 ﻿using FinanceDiary.App;
+using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
 using FinanceDiary.Infra.Options;
@@ -15,6 +16,7 @@ namespace FinanceDiary.Infra.IoC
             serviceCollection.AddSingleton<IFinanceDiaryManager, FinanceDiaryManager>();
             serviceCollection.AddSingleton<IOperationsFactory, OperationsFactory>();
             serviceCollection.AddSingleton<IIdGenerator, IdGenerator>();
+            serviceCollection.AddSingleton<IFinanceDiaryDatabase, FinanceDiaryDatabase>();
 
             // Binds between IConfiguration to DatabaseConfigurtaion.
             serviceCollection.Configure<DatabaseConfiguration>(configuration);

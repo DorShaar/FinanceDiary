@@ -13,6 +13,7 @@ namespace FinanceDiary.App
             OperationKind operationKind, string reason);
         bool AddNeutralOperation(string date, int amount, string sourceCashRegisterName,
             string destinationCashRegisterName, string reason);
-        Task SaveToCsv(string csvPath);
+
+        Task SaveToDatabase();
     }
 }

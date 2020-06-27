@@ -1,9 +1,11 @@
 ﻿using FakeItEasy;
 using FinanceDiary.Domain.CashRegisters;
+using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
 using FinanceDiary.Infra;
 using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,21 +16,35 @@ namespace FinanceDiary.TestsUnit.Infra
 {
     public class FinanceDiaryManagerTests
     {
-        [Fact]
-        public void Ctor_HasDefaultAccount()
-        {
-            FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
+        private const string DefaultCashRegisterName = "Default Account";
+        private readonly IFinanceDiaryDatabase mFinanceDiaryDatabase = A.Fake<IFinanceDiaryDatabase>();
 
-            IEnumerable<CashRegister> cashRegisters = financeDiaryManager.GetAllCashRegisters();
-            Assert.Equal("Default Account", cashRegisters.First().Name);
+        public FinanceDiaryManagerTests()
+        {
+            List<CashRegister> cashRegisters = new List<CashRegister>
+            {
+                new CashRegister(DefaultCashRegisterName)
+            };
+
+            A.CallTo(() => mFinanceDiaryDatabase.LoadCashRegistersFromCsv()).Returns(cashRegisters);
+        }
+
+        [Fact]
+        public void Ctor_HasNoDefaultCachRegister_ThrowsInvalidOperationException()
+        {
+            Assert.Throws<InvalidOperationException>(() => new FinanceDiaryManager(
+               A.Dummy<IOperationsFactory>(),
+               A.Dummy<IFinanceDiaryDatabase>(),
+               NullLogger<FinanceDiaryManager>.Instance));
         }
 
         [Fact]
         public void AddCashRegister_CashRegisterAlreadyExists_DoesNotAdd()
         {
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
+                A.Dummy<IOperationsFactory>(),
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
             Assert.False(financeDiaryManager.AddCashRegister("Default Account"));
@@ -40,7 +56,9 @@ namespace FinanceDiary.TestsUnit.Infra
         public void AddCashRegister_CashRegisterNotExists_CashRegisterAdded()
         {
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                 A.Dummy<IOperationsFactory>(), NullLogger<FinanceDiaryManager>.Instance);
+                A.Dummy<IOperationsFactory>(),
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
             Assert.True(financeDiaryManager.AddCashRegister("another new account"));
@@ -61,7 +79,9 @@ namespace FinanceDiary.TestsUnit.Infra
             IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+                operationsFactory,
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.False(financeDiaryManager.AddFinanceOperation(
                 date, operationType, amount, operationKind, reason));
@@ -78,7 +98,9 @@ namespace FinanceDiary.TestsUnit.Infra
             IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+                operationsFactory,
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.True(financeDiaryManager.AddFinanceOperation(
                 date, operationType, amount, operationKind, reason));
@@ -100,7 +122,9 @@ namespace FinanceDiary.TestsUnit.Infra
             IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+                operationsFactory,
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             financeDiaryManager.AddCashRegister("cash1");
             financeDiaryManager.AddCashRegister("cash2");
@@ -126,7 +150,9 @@ namespace FinanceDiary.TestsUnit.Infra
             IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+                operationsFactory,
+                mFinanceDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
             financeDiaryManager.AddCashRegister("cash1");
             financeDiaryManager.AddCashRegister("cash2");
@@ -136,37 +162,30 @@ namespace FinanceDiary.TestsUnit.Infra
         }
 
         [Fact]
-        public async Task SaveToCsv_Test()
+        public async Task SaveToDatabase_SaveMethodsAreCalled()
         {
-            IIdGenerator idGenerator = A.Fake<IIdGenerator>();
-            A.CallTo(() => idGenerator.GenerateId()).Returns("1");
+            IFinanceDiaryDatabase financeDiaryDatabase = A.Fake<IFinanceDiaryDatabase>();
 
-            IOperationsFactory operationsFactory = new OperationsFactory(idGenerator);
+            List<CashRegister> cashRegisters = new List<CashRegister>
+            {
+                new CashRegister(DefaultCashRegisterName)
+            };
+
+            A.CallTo(() => financeDiaryDatabase.LoadCashRegistersFromCsv()).Returns(cashRegisters);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                operationsFactory, NullLogger<FinanceDiaryManager>.Instance);
+                A.Dummy<IOperationsFactory>(),
+                financeDiaryDatabase,
+                NullLogger<FinanceDiaryManager>.Instance);
 
-            FinanceOperation expectedFinanceOperation = operationsFactory.CreateFinanceOperation(
-                "24/06/2020", OperationType.Withdraw, 3000, OperationKind.CreditCard, "testing");
+            await financeDiaryManager.SaveToDatabase().ConfigureAwait(false);
 
-            financeDiaryManager.AddFinanceOperation(
-                expectedFinanceOperation.Date.ToString(), 
-                expectedFinanceOperation.OperationType,
-                expectedFinanceOperation.Amount,
-                expectedFinanceOperation.OperationKind,
-                expectedFinanceOperation.Reason);
-
-            string tempCsvFile = Path.GetRandomFileName() + ".csv";
-
-            try
-            {
-                await financeDiaryManager.SaveToCsv(tempCsvFile);
-                Assert.True(File.Exists(tempCsvFile));
-            }
-            finally
-            {
-                File.Delete(tempCsvFile);
-            }
+            A.CallTo(() => financeDiaryDatabase.SaveCashRegistersToCsv(A<HashSet<CashRegister>>.Ignored))
+                .MustHaveHappenedOnceExactly();
+            A.CallTo(() => financeDiaryDatabase.SaveFinanceOperationsToCsv(A<List<FinanceOperation>>.Ignored))
+                .MustHaveHappenedOnceExactly();
+            A.CallTo(() => financeDiaryDatabase.SaveNeutralOperationsToCsv(A<List<NeutralOperation>>.Ignored))
+                .MustHaveHappenedOnceExactly();
         }
     }
 }

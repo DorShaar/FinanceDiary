@@ -1,14 +1,12 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using FinanceDiary.App;
+﻿using FinanceDiary.App;
 using FinanceDiary.Domain.CashRegisters;
+using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Globalization;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FinanceDiary.Infra
@@ -16,24 +14,26 @@ namespace FinanceDiary.Infra
     public class FinanceDiaryManager : IFinanceDiaryManager
     {
         private readonly IOperationsFactory mOperationsFactory;
+        private readonly IFinanceDiaryDatabase mFinanceDiaryDatabase;
         private readonly ILogger<FinanceDiaryManager> mLogger;
 
         private const string DefaultAccountName = "Default Account";
-        private readonly CashRegister DefaultCacheRegister = new CashRegister(DefaultAccountName);
-        private readonly HashSet<CashRegister> mCashRegisters;
-        private readonly List<FinanceOperation> mFinanceOperations = new List<FinanceOperation>();
-        private readonly List<NeutralOperation> mNeutralOperations = new List<NeutralOperation>();
+        private readonly CashRegister DefaultCacheRegister;
+        private HashSet<CashRegister> mCashRegisters;
+        private List<FinanceOperation> mFinanceOperations;
+        private List<NeutralOperation> mNeutralOperations;
 
         public FinanceDiaryManager(
-            IOperationsFactory operationsFactory, ILogger<FinanceDiaryManager> logger)
+            IOperationsFactory operationsFactory,
+            IFinanceDiaryDatabase financeDiaryDatabase,
+            ILogger<FinanceDiaryManager> logger)
         {
-            mCashRegisters = new HashSet<CashRegister>(new CashRegisterComparer())
-            {
-                DefaultCacheRegister
-            };
-
             mOperationsFactory = operationsFactory;
+            mFinanceDiaryDatabase = financeDiaryDatabase;
             mLogger = logger;
+
+            LoadFromDatabase().Wait();
+            DefaultCacheRegister = mCashRegisters.First(cash => cash.Name.Equals(DefaultAccountName));
         }
 
         public bool AddCashRegister(string cachRegisterName)
@@ -142,14 +142,26 @@ namespace FinanceDiary.Infra
             return mCashRegisters.ToImmutableArray();
         }
 
-        public async Task SaveToCsv(string csvPath)
+        public async Task SaveToDatabase()
         {
-            using StreamWriter writer = new StreamWriter(csvPath);
+            Task[] tasks = new Task[]
+            {
+                mFinanceDiaryDatabase.SaveCashRegistersToCsv(mCashRegisters),
+                mFinanceDiaryDatabase.SaveFinanceOperationsToCsv(mFinanceOperations),
+                mFinanceDiaryDatabase.SaveNeutralOperationsToCsv(mNeutralOperations)
+            };
 
-            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
 
-            using CsvWriter csvWriter = new CsvWriter(writer, csvConfiguration);
-            await csvWriter.WriteRecordsAsync(mFinanceOperations);
+        private async Task LoadFromDatabase()
+        {
+            List<CashRegister> cashRegisters = await mFinanceDiaryDatabase.LoadCashRegistersFromCsv();
+            mCashRegisters = cashRegisters.ToHashSet(new CashRegisterComparer());
+
+            mFinanceOperations = await mFinanceDiaryDatabase.LoadFinanceOperationsFromCsv();
+
+            mNeutralOperations = await mFinanceDiaryDatabase.LoadNeutralOperationsFromCsv();
         }
     }
 }

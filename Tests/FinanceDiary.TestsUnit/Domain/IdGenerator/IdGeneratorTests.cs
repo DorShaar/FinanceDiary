@@ -20,7 +20,7 @@ namespace FinanceDiary.TestsUnit.Domain.IdGenerator
 
             DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration
             { 
-                CsvPath = tempIdHolderFile
+                DatabasePath = tempIdHolderFile
             };
 
             IOptionsMonitor<DatabaseConfiguration> datebaseOptions = 
@@ -53,7 +53,7 @@ namespace FinanceDiary.TestsUnit.Domain.IdGenerator
 
             DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration
             {
-                CsvPath = tempIdHolderFile
+                DatabasePath = tempIdHolderFile
             };
 
             IOptionsMonitor<DatabaseConfiguration> datebaseOptions =

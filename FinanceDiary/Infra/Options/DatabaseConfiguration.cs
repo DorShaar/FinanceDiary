@@ -2,6 +2,6 @@
 {
     public class DatabaseConfiguration
     {
-        public string CsvPath { get; set; }
+        public string DatabasePath { get; set; }
     }
 }
