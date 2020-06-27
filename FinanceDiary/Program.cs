@@ -1,5 +1,4 @@
-﻿using FinanceDiary.Client;
-using FinanceDiary.Infra;
+﻿using FinanceDiary.Infra;
 using System.Threading;
 using System.Threading.Tasks;
 

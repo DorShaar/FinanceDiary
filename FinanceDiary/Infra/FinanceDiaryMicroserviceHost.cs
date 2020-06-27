@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Serilog;
 using System;
 using System.IO;
 using System.Threading;
@@ -69,10 +68,10 @@ namespace FinanceDiary.Infra
 
                     mConfigTestServices?.Invoke(services);
                 })
-                .UseSerilog((hostBuilderContext, loggerConfig) =>
+                .ConfigureLogging(logging =>
                 {
-                    loggerConfig.ReadFrom.Configuration(hostBuilderContext.Configuration)
-                        .Enrich.WithMachineName();
+                    logging.ClearProviders();
+                    logging.AddConsole();
                 }).Build();
         }
     }
