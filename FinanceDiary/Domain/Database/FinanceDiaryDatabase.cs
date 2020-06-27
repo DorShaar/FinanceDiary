@@ -1,11 +1,9 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using FinanceDiary.Domain.CashRegisters;
+﻿using FinanceDiary.Domain.CashRegisters;
+using FinanceDiary.Domain.Database.CsvHelper;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Infra.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -27,48 +25,97 @@ namespace FinanceDiary.Domain.Database
         {
             string csvPath = Path.Combine(DatabasePath, CashRegisterCsv);
 
-            using StreamWriter writer = new StreamWriter(csvPath);
-            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-            using CsvWriter csvWriter = new CsvWriter(writer, csvConfiguration);
-            
-            await csvWriter.WriteRecordsAsync(cashRegisters);
+            using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
+
+            await csvWriterAdapter.Write(cashRegisters);
         }
 
         public async Task SaveFinanceOperationsToCsv(IEnumerable<FinanceOperation> financeOperations)
         {
             string csvPath = Path.Combine(DatabasePath, FinanceOperationsCsv);
 
-            using StreamWriter writer = new StreamWriter(csvPath);
-            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-            using CsvWriter csvWriter = new CsvWriter(writer, csvConfiguration);
-            
-            await csvWriter.WriteRecordsAsync(financeOperations);
+            using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
+
+            await csvWriterAdapter.Write(financeOperations);
         }
 
         public async Task SaveNeutralOperationsToCsv(IEnumerable<NeutralOperation> neutralOperations)
         {
             string csvPath = Path.Combine(DatabasePath, NeutralOperationsCsv);
 
-            using StreamWriter writer = new StreamWriter(csvPath);
-            CsvConfiguration csvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture);
-            using CsvWriter csvWriter = new CsvWriter(writer, csvConfiguration);
+            using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
 
-            await csvWriter.WriteRecordsAsync(neutralOperations);
+            await csvWriterAdapter.Write(neutralOperations);
         }
 
-        public Task<List<CashRegister>> LoadCashRegistersFromCsv()
+        public List<CashRegister> LoadCashRegistersFromCsv()
         {
-            throw new System.NotImplementedException();
+            string csvPath = Path.Combine(DatabasePath, CashRegisterCsv);
+
+            using CsvReaderAdapter csvReaderAdapter = new CsvReaderAdapter(csvPath);
+
+            List<CashRegister> cashRegisters = new List<CashRegister>();
+            csvReaderAdapter.CsvReader.Read();
+            csvReaderAdapter.CsvReader.ReadHeader();
+            while (csvReaderAdapter.CsvReader.Read())
+            {
+                CashRegister cashRegister = new CashRegister(
+                    csvReaderAdapter.CsvReader.GetField("Name"), 
+                    csvReaderAdapter.CsvReader.GetField<int>("CurrentAmount"));
+                cashRegisters.Add(cashRegister);
+            }
+
+            return cashRegisters;
         }
 
-        public Task<List<FinanceOperation>> LoadFinanceOperationsFromCsv()
+        public List<FinanceOperation> LoadFinanceOperationsFromCsv()
         {
-            throw new System.NotImplementedException();
+            string csvPath = Path.Combine(DatabasePath, FinanceOperationsCsv);
+
+            using CsvReaderAdapter csvReaderAdapter = new CsvReaderAdapter(csvPath);
+
+            List<FinanceOperation> financeOperations = new List<FinanceOperation>();
+            csvReaderAdapter.CsvReader.Read();
+            csvReaderAdapter.CsvReader.ReadHeader();
+            while (csvReaderAdapter.CsvReader.Read())
+            {
+                FinanceOperation financeOperation = new FinanceOperation(
+                    csvReaderAdapter.CsvReader.GetField("Id"), 
+                    csvReaderAdapter.CsvReader.GetField("Date"),
+                    csvReaderAdapter.CsvReader.GetField<OperationType>("OperationType"),
+                    csvReaderAdapter.CsvReader.GetField<int>("Amount"),
+                    csvReaderAdapter.CsvReader.GetField<OperationKind>("OperationKind"),
+                    csvReaderAdapter.CsvReader.GetField("Reason"));
+
+                financeOperations.Add(financeOperation);
+            }
+
+            return financeOperations;
         }
 
-        public Task<List<NeutralOperation>> LoadNeutralOperationsFromCsv()
+        public List<NeutralOperation> LoadNeutralOperationsFromCsv()
         {
-            throw new System.NotImplementedException();
+            string csvPath = Path.Combine(DatabasePath, NeutralOperationsCsv);
+
+            using CsvReaderAdapter csvReaderAdapter = new CsvReaderAdapter(csvPath);
+
+            List<NeutralOperation> neutralOperations = new List<NeutralOperation>();
+            csvReaderAdapter.CsvReader.Read();
+            csvReaderAdapter.CsvReader.ReadHeader();
+            while (csvReaderAdapter.CsvReader.Read())
+            {
+                NeutralOperation neutralOperation = new NeutralOperation(
+                    csvReaderAdapter.CsvReader.GetField("Id"),
+                    csvReaderAdapter.CsvReader.GetField("Date"),
+                    csvReaderAdapter.CsvReader.GetField<int>("Amount"),
+                    csvReaderAdapter.CsvReader.GetField("SourceCashRegister"),
+                    csvReaderAdapter.CsvReader.GetField("DestinationCashRegister"),
+                    csvReaderAdapter.CsvReader.GetField("Reason"));
+
+                neutralOperations.Add(neutralOperation);
+            }
+
+            return neutralOperations;
         }
     }
 }

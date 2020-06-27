@@ -10,8 +10,8 @@ namespace FinanceDiary.Domain.Database
         Task SaveCashRegistersToCsv(HashSet<CashRegister> cashRegisters);
         Task SaveFinanceOperationsToCsv(IEnumerable<FinanceOperation> financeOperations);
         Task SaveNeutralOperationsToCsv(IEnumerable<NeutralOperation> neutralOperations);
-        Task<List<CashRegister>> LoadCashRegistersFromCsv();
-        Task<List<FinanceOperation>> LoadFinanceOperationsFromCsv();
-        Task<List<NeutralOperation>> LoadNeutralOperationsFromCsv();
+        List<CashRegister> LoadCashRegistersFromCsv();
+        List<FinanceOperation> LoadFinanceOperationsFromCsv();
+        List<NeutralOperation> LoadNeutralOperationsFromCsv();
     }
 }

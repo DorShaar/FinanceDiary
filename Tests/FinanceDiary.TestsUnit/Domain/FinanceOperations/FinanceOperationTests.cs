@@ -19,15 +19,17 @@ namespace FinanceDiary.TestsUnit.Domain.FinanceOperations
             mOperationsFactory = new OperationsFactory(idGenerator);
         }
 
-        [Fact]
-        public void Ctor_ValidParametersDateFormat_CorrectParametrs()
+        [Theory]
+        [InlineData("20/01/1992")]
+        [InlineData("20/01/1992 00:00:00")]
+        public void Ctor_ValidParametersDateFormat_CorrectParametrs(string date)
         {
             OperationType operationType = OperationType.Deposit;
             int amount = 30;
             OperationKind operationKind = OperationKind.Family;
             string reason = "reason";
 
-            FinanceOperation financeOperation = mOperationsFactory.CreateFinanceOperation("20/01/1992",
+            FinanceOperation financeOperation = mOperationsFactory.CreateFinanceOperation(date,
                 operationType,
                 amount,
                 operationKind,

@@ -15,6 +15,15 @@ namespace FinanceDiary.Domain.CashRegisters
             Name = name;
         }
 
+        internal CashRegister(string name, int currentAmount)
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException($"{nameof(name)}");
+
+            Name = name;
+            CurrentAmount = currentAmount;
+        }
+
         public void Deposit(int amount)
         {
             if (amount <= 0)

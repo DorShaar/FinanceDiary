@@ -166,14 +166,16 @@ namespace FinanceDiary.Infra
             await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
-        private async Task LoadFromDatabase()
+        private Task LoadFromDatabase()
         {
-            List<CashRegister> cashRegisters = await mFinanceDiaryDatabase.LoadCashRegistersFromCsv();
+            List<CashRegister> cashRegisters = mFinanceDiaryDatabase.LoadCashRegistersFromCsv().ToList();
             mCashRegisters = cashRegisters.ToHashSet(new CashRegisterComparer());
 
-            mFinanceOperations = await mFinanceDiaryDatabase.LoadFinanceOperationsFromCsv();
+            mFinanceOperations = mFinanceDiaryDatabase.LoadFinanceOperationsFromCsv().ToList();
 
-            mNeutralOperations = await mFinanceDiaryDatabase.LoadNeutralOperationsFromCsv();
+            mNeutralOperations = mFinanceDiaryDatabase.LoadNeutralOperationsFromCsv().ToList();
+
+            return Task.CompletedTask;
         }
     }
 }

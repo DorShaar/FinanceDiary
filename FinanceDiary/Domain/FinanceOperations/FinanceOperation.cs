@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -30,7 +31,15 @@ namespace FinanceDiary.Domain.FinanceOperations
         private void ValidateAndSetDate(string date)
         {
             if (!DateTime.TryParse(date, out DateTime parsedDate))
-                throw new ArgumentException(nameof(date));
+            {
+                if (!DateTime.TryParseExact(
+                    date, "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDateSecondTry))
+                {
+                    throw new ArgumentException(nameof(date));
+                }
+
+                parsedDate = parsedDateSecondTry;
+            }
 
             Date = parsedDate;
         }
