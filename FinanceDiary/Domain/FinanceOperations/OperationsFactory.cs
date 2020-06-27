@@ -1,5 +1,6 @@
 ﻿using FinanceDiary.Domain.IdGenerators;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -33,6 +34,11 @@ namespace FinanceDiary.Domain.FinanceOperations
             string id = mIdGenerator.GenerateId();
             return new NeutralOperation(
                 id, date, amount, sourceCashRegister, destinationCashRegister, reason);
+        }
+
+        public async Task SaveState()
+        {
+            await mIdGenerator.SaveState().ConfigureAwait(false);
         }
     }
 }

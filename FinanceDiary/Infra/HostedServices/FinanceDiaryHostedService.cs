@@ -27,7 +27,6 @@ namespace FinanceDiary.Infra.HostedServices
             while (!ShouldExit(userInput))
             {
                 mCommandLineRunner.RunCommand(userInput.Split(" "));
-                //Print();
                 userInput = Console.ReadLine();
             }
                 
@@ -46,8 +45,6 @@ namespace FinanceDiary.Infra.HostedServices
         public Task StopAsync(CancellationToken cancellationToken)
         {
             mLogger.LogInformation($"Stopped hosted service Finance-Diary-App");
-
-            // TODO Save here.
 
             return Task.CompletedTask;
         }

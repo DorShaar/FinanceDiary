@@ -47,9 +47,9 @@ namespace FinanceDiary.Infra
             return new FinanceReport(mCashRegisters, mFinanceOperations, mNeutralOperations);
         }
 
-        public bool AddCashRegister(string cachRegisterName)
+        public bool AddCashRegister(string cachRegisterName, int initialAmount = 0)
         {
-            if (!mCashRegisters.Add(new CashRegister(cachRegisterName)))
+            if (!mCashRegisters.Add(new CashRegister(cachRegisterName, initialAmount)))
             {
                 mLogger.LogDebug($"Cash register with name {cachRegisterName} is already exists");
                 return false;
@@ -160,7 +160,8 @@ namespace FinanceDiary.Infra
             {
                 mFinanceDiaryDatabase.SaveCashRegistersToCsv(mCashRegisters),
                 mFinanceDiaryDatabase.SaveFinanceOperationsToCsv(mFinanceOperations),
-                mFinanceDiaryDatabase.SaveNeutralOperationsToCsv(mNeutralOperations)
+                mFinanceDiaryDatabase.SaveNeutralOperationsToCsv(mNeutralOperations),
+                mOperationsFactory.SaveState()
             };
 
             await Task.WhenAll(tasks).ConfigureAwait(false);

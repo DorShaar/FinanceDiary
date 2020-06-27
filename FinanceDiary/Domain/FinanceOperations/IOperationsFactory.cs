@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -17,5 +18,7 @@ namespace FinanceDiary.Domain.FinanceOperations
             string sourceCashRegister,
             string destinationCashRegister,
             string reason);
+
+        Task SaveState();
     }
 }

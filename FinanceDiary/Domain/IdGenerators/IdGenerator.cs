@@ -1,8 +1,8 @@
 ﻿using FinanceDiary.Domain.Options;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace FinanceDiary.Domain.IdGenerators
 {
@@ -11,20 +11,16 @@ namespace FinanceDiary.Domain.IdGenerators
         private const string NextIdHolderName = "id_producer.db";
 
         private static int mLastId = 0;
-        private readonly ILogger<IdGenerator> mLogger;
+        private readonly string mIdHolderPath;
 
-        public IdGenerator(IOptionsMonitor<DatabaseConfiguration> configuration, ILogger<IdGenerator> logger)
+        public IdGenerator(IOptionsMonitor<DatabaseConfiguration> configuration)
         {
-            mLogger = logger;
+            mIdHolderPath = Path.Combine(configuration.CurrentValue.DatabasePath, NextIdHolderName);
 
-            string idHolderPath = 
-                Path.Combine(Path.GetDirectoryName(configuration.CurrentValue.DatabasePath), NextIdHolderName);
-
-            string idString = File.ReadAllText(idHolderPath);
+            string idString = File.ReadAllText(mIdHolderPath);
             if (!int.TryParse(idString, out int lastId))
             {
-                mLogger.LogError($"Could not parse next id from path {idHolderPath}");
-                throw new ArgumentException($"Could not parse next id from path {idHolderPath}");
+                throw new ArgumentException($"Could not parse next id from path {mIdHolderPath}");
             }
 
             mLastId = lastId;
@@ -35,6 +31,11 @@ namespace FinanceDiary.Domain.IdGenerators
             string stringID = mLastId.ToString();
             mLastId++;
             return stringID;
+        }
+
+        public async Task SaveState()
+        {
+            await File.WriteAllTextAsync(mIdHolderPath, mLastId.ToString()).ConfigureAwait(false);
         }
     }
 }

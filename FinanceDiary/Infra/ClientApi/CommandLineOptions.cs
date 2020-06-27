@@ -13,8 +13,8 @@ namespace FinanceDiary.Infra.ClientApi
             [Option('d', "date", HelpText = "Date", Required = true)]
             public string Date { get; set; }
 
-            [Option('k', "kind", HelpText = "Operation kind", Required = true)]
-            public int Kind { get; set; }
+            [Option('k', "kinds", HelpText = "Operation kinds", Required = true)]
+            public string Kinds { get; set; }
 
             [Option('r', "reason", HelpText = "Operation kind", Required = true)]
             public string Reason { get; set; }
@@ -29,8 +29,8 @@ namespace FinanceDiary.Infra.ClientApi
             [Option('d', "date", HelpText = "Date", Required = true)]
             public string Date { get; set; }
 
-            [Option('k', "kind", HelpText = "Operation kind", Required = true)]
-            public int Kind { get; set; }
+            [Option('k', "kinds", HelpText = "Operation kinds", Required = true)]
+            public string Kinds { get; set; }
 
             [Option('r', "reason", HelpText = "Operation kind", Required = true)]
             public string Reason { get; set; }
@@ -46,10 +46,10 @@ namespace FinanceDiary.Infra.ClientApi
             public string Date { get; set; }
              
             [Option('s', "source", HelpText = "Source cash register", Required = true)]
-            public int SourceCashRegister { get; set; }
+            public string SourceCashRegister { get; set; }
 
             [Option('d', "dest", HelpText = "Destination cash register", Required = true)]
-            public int DestinationCashRegister { get; set; }
+            public string DestinationCashRegister { get; set; }
 
             [Option('r', "reason", HelpText = "Operation kind", Required = true)]
             public string Reason { get; set; }
@@ -58,11 +58,11 @@ namespace FinanceDiary.Infra.ClientApi
         [Verb("register", HelpText = "register <cash-register-name> <initial-amount>")]
         public class RegsiterCashOptions
         {
-            [Value(0, HelpText = "Amount")]
-            public int Amount { get; set; }
+            [Value(0, HelpText = "Name")]
+            public string Name { get; set; }
 
             [Value(1, HelpText = "InitialAmount")]
-            public string InitialAmount { get; set; }
+            public int InitialAmount { get; set; }
         }
 
         [Verb("get", HelpText = "get (cash-register, report)")]
@@ -70,6 +70,11 @@ namespace FinanceDiary.Infra.ClientApi
         {
             [Value(0, HelpText = "Object type (cash-register, report)")]
             public string ObjectType { get; set; }
+        }
+
+        [Verb("save", HelpText = "save database")]
+        public class SaveOptions
+        {
         }
     }
 }

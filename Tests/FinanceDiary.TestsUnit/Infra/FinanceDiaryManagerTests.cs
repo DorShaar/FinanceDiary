@@ -165,8 +165,9 @@ namespace FinanceDiary.TestsUnit.Infra
         public async Task SaveToDatabase_SaveMethodsAreCalled()
         {
             IFinanceDiaryDatabase financeDiaryDatabase = A.Fake<IFinanceDiaryDatabase>();
+            IOperationsFactory operationsFactory = A.Fake<IOperationsFactory>();
 
-            List<CashRegister> cashRegisters = new List<CashRegister>
+            List <CashRegister> cashRegisters = new List<CashRegister>
             {
                 new CashRegister(DefaultCashRegisterName)
             };
@@ -174,7 +175,7 @@ namespace FinanceDiary.TestsUnit.Infra
             A.CallTo(() => financeDiaryDatabase.LoadCashRegistersFromCsv()).Returns(cashRegisters);
 
             FinanceDiaryManager financeDiaryManager = new FinanceDiaryManager(
-                A.Dummy<IOperationsFactory>(),
+                operationsFactory,
                 financeDiaryDatabase,
                 NullLogger<FinanceDiaryManager>.Instance);
 
@@ -186,6 +187,7 @@ namespace FinanceDiary.TestsUnit.Infra
                 .MustHaveHappenedOnceExactly();
             A.CallTo(() => financeDiaryDatabase.SaveNeutralOperationsToCsv(A<List<NeutralOperation>>.Ignored))
                 .MustHaveHappenedOnceExactly();
+            A.CallTo(() => operationsFactory.SaveState()).MustHaveHappenedOnceExactly();
         }
     }
 }
