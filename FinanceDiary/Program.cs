@@ -1,14 +1,15 @@
 ﻿using FinanceDiary.Client;
+using FinanceDiary.Infra;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FinanceDiary
 {
     class Program
     {
-        static void Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            ConsoleUI consoleUI = new ConsoleUI();
-
-            consoleUI.Print();
+            return await new FinanceDiaryMicroserviceHost().RunAsync(args, CancellationToken.None).ConfigureAwait(false);
         }
     }
 }

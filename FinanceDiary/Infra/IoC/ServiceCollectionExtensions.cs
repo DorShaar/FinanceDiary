@@ -1,4 +1,5 @@
 ﻿using FinanceDiary.App;
+using FinanceDiary.Client;
 using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
@@ -21,6 +22,8 @@ namespace FinanceDiary.Infra.IoC
             // Binds between IConfiguration to DatabaseConfigurtaion.
             serviceCollection.Configure<DatabaseConfiguration>(configuration);
             serviceCollection.AddOptions();
+
+            serviceCollection.AddHostedService<ConsoleUI>();
 
             return serviceCollection;
         }
