@@ -1,18 +1,21 @@
 ﻿using ConsoleTables;
+using FinanceDiary.Infra.ClientApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FinanceDiary.Client
+namespace FinanceDiary.Infra.HostedServices
 {
-    public class ConsoleUI : IHostedService
+    public class FinanceDiaryHostedService : IHostedService
     {
-        private readonly ILogger<ConsoleUI> mLogger;
+        private readonly ICommandLineRunner mCommandLineRunner;
+        private readonly ILogger<FinanceDiaryHostedService> mLogger;
 
-        public ConsoleUI(ILogger<ConsoleUI> logger)
+        public FinanceDiaryHostedService(ICommandLineRunner commandLineRunner, ILogger<FinanceDiaryHostedService> logger)
         {
+            mCommandLineRunner = commandLineRunner;
             mLogger = logger;
         }
 
@@ -20,11 +23,12 @@ namespace FinanceDiary.Client
         {
             mLogger.LogInformation($"Started hosted service Finance-Diary-App");
 
-            string userInput = string.Empty;
+            string userInput = Console.ReadLine();
 
             while (!ShouldExit(userInput))
             {
-                Print();
+                mCommandLineRunner.RunCommand(userInput.Split(" "));
+                //Print();
                 userInput = Console.ReadLine();
             }
                 

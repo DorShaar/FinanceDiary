@@ -1,5 +1,5 @@
 ﻿using FakeItEasy;
-using FinanceDiary.Infra.Options;
+using FinanceDiary.Domain.Options;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System;

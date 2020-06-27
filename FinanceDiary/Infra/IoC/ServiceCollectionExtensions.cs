@@ -1,9 +1,10 @@
 ﻿using FinanceDiary.App;
-using FinanceDiary.Client;
 using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
-using FinanceDiary.Infra.Options;
+using FinanceDiary.Domain.Options;
+using FinanceDiary.Infra.ClientApi;
+using FinanceDiary.Infra.HostedServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,12 +19,13 @@ namespace FinanceDiary.Infra.IoC
             serviceCollection.AddSingleton<IOperationsFactory, OperationsFactory>();
             serviceCollection.AddSingleton<IIdGenerator, IdGenerator>();
             serviceCollection.AddSingleton<IFinanceDiaryDatabase, FinanceDiaryDatabase>();
+            serviceCollection.AddSingleton<ICommandLineRunner, CommandLineParserAdapter>();
 
             // Binds between IConfiguration to DatabaseConfigurtaion.
             serviceCollection.Configure<DatabaseConfiguration>(configuration);
             serviceCollection.AddOptions();
 
-            serviceCollection.AddHostedService<ConsoleUI>();
+            serviceCollection.AddHostedService<FinanceDiaryHostedService>();
 
             return serviceCollection;
         }

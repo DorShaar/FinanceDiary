@@ -22,9 +22,9 @@ namespace FinanceDiary.Domain.FinanceOperations
         {
             Id = id;
             ValidateAndSetDate(date);
-            OperationType = operationType;
+            ValidateanSetOperationType(operationType);
             ValidateAndSetAmount(amount);
-            OperationKind = operationKind;
+            ValidateanSetOperationKind(operationKind);
             ValidateAndSetReason(reason);
         }
 
@@ -44,6 +44,16 @@ namespace FinanceDiary.Domain.FinanceOperations
             Date = parsedDate;
         }
 
+        private void ValidateanSetOperationType(OperationType operationType)
+        {
+            if (!Enum.IsDefined(typeof(OperationType), operationType))
+            {
+                throw new ArgumentException(nameof(operationType));
+            }
+
+            OperationType = operationType;
+        }
+
         private void ValidateAndSetAmount(int amount)
         {
             if (amount <= 0)
@@ -52,12 +62,22 @@ namespace FinanceDiary.Domain.FinanceOperations
             Amount = amount;
         }
 
+        private void ValidateanSetOperationKind(OperationKind operationKind)
+        {
+            if (!Enum.IsDefined(typeof(OperationKind), operationKind))
+            {
+                throw new ArgumentException(nameof(operationKind));
+            }
+
+            OperationKind = operationKind;
+        }
+
         private void ValidateAndSetReason(string reason)
         {
             if (string.IsNullOrEmpty(reason))
                 throw new ArgumentException($"{nameof(reason)} is null or empty");
 
-            Reason = reason;
+            Reason = reason.Trim('\"');
         }
     }
 }

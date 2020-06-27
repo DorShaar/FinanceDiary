@@ -3,7 +3,7 @@ using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.Database;
 using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
-using FinanceDiary.Infra.Options;
+using FinanceDiary.Domain.Options;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;

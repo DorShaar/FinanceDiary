@@ -1,4 +1,4 @@
-﻿namespace FinanceDiary.Infra.Options
+﻿namespace FinanceDiary.Domain.Options
 {
     public class DatabaseConfiguration
     {

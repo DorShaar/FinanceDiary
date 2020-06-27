@@ -1,7 +1,7 @@
 ﻿using FinanceDiary.Domain.CashRegisters;
 using FinanceDiary.Domain.Database.CsvHelper;
 using FinanceDiary.Domain.FinanceOperations;
-using FinanceDiary.Infra.Options;
+using FinanceDiary.Domain.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.IO;

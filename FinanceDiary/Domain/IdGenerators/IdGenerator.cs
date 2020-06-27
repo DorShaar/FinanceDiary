@@ -1,4 +1,4 @@
-﻿using FinanceDiary.Infra.Options;
+﻿using FinanceDiary.Domain.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
