@@ -1,4 +1,6 @@
-﻿namespace FinanceDiary.Domain.FinanceOperations
+﻿using System.Collections.Generic;
+
+namespace FinanceDiary.Domain.FinanceOperations
 {
     public interface IOperationsFactory
     {
@@ -6,7 +8,7 @@
             string date,
             OperationType operationType,
             int amount,
-            OperationKind operationKind,
+            IEnumerable<OperationKind> operationKinds,
             string reason);
 
         NeutralOperation CreateNeutralOperation(

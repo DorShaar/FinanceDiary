@@ -46,9 +46,9 @@ namespace FinanceDiary.TestsUnit.Domain.Reports
 
             List<FinanceOperation> financeOperations = new List<FinanceOperation>
             {
-                mOperationsFactory.CreateFinanceOperation("24/06/2022", OperationType.Deposit, 300, OperationKind.Friends, "reason"),
-                mOperationsFactory.CreateFinanceOperation("24/07/2022", OperationType.Deposit, 300, OperationKind.Friends, "reason"),
-                mOperationsFactory.CreateFinanceOperation("22/06/2022", OperationType.Deposit, 300, OperationKind.Friends, "reason")
+                mOperationsFactory.CreateFinanceOperation("24/06/2022", OperationType.Deposit, 300, new List<OperationKind> { OperationKind.Friends }, "reason"),
+                mOperationsFactory.CreateFinanceOperation("24/07/2022", OperationType.Deposit, 300, new List<OperationKind> { OperationKind.Friends }, "reason"),
+                mOperationsFactory.CreateFinanceOperation("22/06/2022", OperationType.Deposit, 300, new List<OperationKind> { OperationKind.Friends }, "reason")
             };
 
             List<NeutralOperation> neutralOperations = new List<NeutralOperation>

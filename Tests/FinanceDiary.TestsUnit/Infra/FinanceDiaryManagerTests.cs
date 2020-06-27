@@ -84,7 +84,7 @@ namespace FinanceDiary.TestsUnit.Infra
                 NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.False(financeDiaryManager.AddFinanceOperation(
-                date, operationType, amount, operationKind, reason));
+                date, operationType, amount, new List<OperationKind> { operationKind }, reason));
         }
 
         [Theory]
@@ -103,7 +103,7 @@ namespace FinanceDiary.TestsUnit.Infra
                 NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.True(financeDiaryManager.AddFinanceOperation(
-                date, operationType, amount, operationKind, reason));
+                date, operationType, amount, new List<OperationKind> { operationKind }, reason));
         }
 
         [Theory]

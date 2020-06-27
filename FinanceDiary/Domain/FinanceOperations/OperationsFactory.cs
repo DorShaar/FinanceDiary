@@ -1,4 +1,5 @@
 ﻿using FinanceDiary.Domain.IdGenerators;
+using System.Collections.Generic;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -15,11 +16,11 @@ namespace FinanceDiary.Domain.FinanceOperations
             string date, 
             OperationType operationType, 
             int amount, 
-            OperationKind operationKind, 
+            IEnumerable<OperationKind> operationKinds, 
             string reason)
         {
             string id = mIdGenerator.GenerateId();
-            return new FinanceOperation(id, date, operationType, amount, operationKind, reason);
+            return new FinanceOperation(id, date, operationType, amount, operationKinds, reason);
         }
 
         public NeutralOperation CreateNeutralOperation(

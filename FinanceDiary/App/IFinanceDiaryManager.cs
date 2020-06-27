@@ -13,7 +13,7 @@ namespace FinanceDiary.App
 
         bool AddCashRegister(string cachRegisterName);
         bool AddFinanceOperation(string date, OperationType operationType, int amount,
-            OperationKind operationKind, string reason);
+            IEnumerable<OperationKind> operationKinds, string reason);
         bool AddNeutralOperation(string date, int amount, string sourceCashRegisterName,
             string destinationCashRegisterName, string reason);
 

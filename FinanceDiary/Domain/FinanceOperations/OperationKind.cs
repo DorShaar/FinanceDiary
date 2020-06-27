@@ -1,7 +1,11 @@
-﻿namespace FinanceDiary.Domain.FinanceOperations
+﻿using System;
+
+namespace FinanceDiary.Domain.FinanceOperations
 {
+    [Flags]
     public enum OperationKind
     {
+        None = 0,
         Study = 2,
         Food = 4,
         Fun = 8,

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace FinanceDiary.Domain.FinanceOperations
 {
@@ -9,7 +11,7 @@ namespace FinanceDiary.Domain.FinanceOperations
         public DateTime Date { get; private set; }
         public OperationType OperationType { get; private set; }
         public int Amount { get; private set; }
-        public OperationKind OperationKind { get; private set; }
+        public OperationKinds OperationKinds { get; private set; }
         public string Reason { get; private set; }
 
         internal FinanceOperation(
@@ -17,14 +19,14 @@ namespace FinanceDiary.Domain.FinanceOperations
             string date,
             OperationType operationType,
             int amount,
-            OperationKind operationKind,
+            IEnumerable<OperationKind> operationKinds,
             string reason)
         {
             Id = id;
             ValidateAndSetDate(date);
             ValidateanSetOperationType(operationType);
             ValidateAndSetAmount(amount);
-            ValidateanSetOperationKind(operationKind);
+            ValidateAndSetOperationKind(operationKinds);
             ValidateAndSetReason(reason);
         }
 
@@ -62,14 +64,17 @@ namespace FinanceDiary.Domain.FinanceOperations
             Amount = amount;
         }
 
-        private void ValidateanSetOperationKind(OperationKind operationKind)
+        private void ValidateAndSetOperationKind(IEnumerable<OperationKind> operationKinds)
         {
-            if (!Enum.IsDefined(typeof(OperationKind), operationKind))
+            foreach (OperationKind operationKind in operationKinds)
             {
-                throw new ArgumentException(nameof(operationKind));
+                if (!Enum.IsDefined(typeof(OperationKind), operationKind))
+                {
+                    throw new ArgumentException(nameof(operationKind));
+                }
             }
 
-            OperationKind = operationKind;
+            OperationKinds = new OperationKinds(operationKinds.ToArray());
         }
 
         private void ValidateAndSetReason(string reason)

@@ -69,9 +69,9 @@ namespace FinanceDiary.TestsUnit.Domain.Database
             {
                 List<FinanceOperation> financeOperations = new List<FinanceOperation>
                 {
-                    mOperationsFactory.CreateFinanceOperation("24/06/2018", OperationType.Deposit, 200, OperationKind.Commission, "reason"),
-                    mOperationsFactory.CreateFinanceOperation("24/06/2019", OperationType.Deposit, 300, OperationKind.Commission, "reason"),
-                    mOperationsFactory.CreateFinanceOperation("24/06/2020", OperationType.Deposit, 400, OperationKind.Commission, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2018", OperationType.Deposit, 200, new List<OperationKind> { OperationKind.Commission }, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2019", OperationType.Deposit, 300, new List<OperationKind> { OperationKind.Commission }, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2020", OperationType.Deposit, 400, new List<OperationKind> { OperationKind.Commission }, "reason"),
                 };
 
                 await financeDiaryDatabase.SaveFinanceOperationsToCsv(financeOperations)
@@ -162,9 +162,9 @@ namespace FinanceDiary.TestsUnit.Domain.Database
             {
                 List<FinanceOperation> financeOperations = new List<FinanceOperation>
                 {
-                    mOperationsFactory.CreateFinanceOperation("24/06/2018", OperationType.Deposit, 200, OperationKind.Commission, "reason"),
-                    mOperationsFactory.CreateFinanceOperation("24/06/2019", OperationType.Deposit, 300, OperationKind.Commission, "reason"),
-                    mOperationsFactory.CreateFinanceOperation("24/06/2020", OperationType.Deposit, 400, OperationKind.Commission, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2018", OperationType.Deposit, 200, new List<OperationKind> { OperationKind.Commission, OperationKind.Fun }, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2019", OperationType.Deposit, 300, new List<OperationKind> { OperationKind.Commission, OperationKind.CreditCard }, "reason"),
+                    mOperationsFactory.CreateFinanceOperation("24/06/2020", OperationType.Deposit, 400, new List<OperationKind> { OperationKind.Commission, OperationKind.Insurance }, "reason"),
                 };
 
                 await financeDiaryDatabase.SaveFinanceOperationsToCsv(financeOperations)

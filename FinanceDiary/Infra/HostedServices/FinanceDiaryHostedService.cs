@@ -1,5 +1,4 @@
-﻿using ConsoleTables;
-using FinanceDiary.Infra.ClientApi;
+﻿using FinanceDiary.Infra.ClientApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -42,15 +41,6 @@ namespace FinanceDiary.Infra.HostedServices
                 userInput.ToLowerInvariant().Equals("stop") ||
                 userInput.ToLowerInvariant().Equals("x") ||
                 userInput.ToLowerInvariant().Equals("bye");
-        }
-
-        public void Print()
-        {
-            ConsoleTable consoleTable = new ConsoleTable("1", "2", "3");
-            consoleTable.AddRow("abc", "cfg", "dfdf");
-            consoleTable.AddRow("ab555c", "cf3434g", "dfd2131231");
-
-            consoleTable.Write(Format.Alternative);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

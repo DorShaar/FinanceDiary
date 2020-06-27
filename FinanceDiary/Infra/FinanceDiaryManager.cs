@@ -59,12 +59,12 @@ namespace FinanceDiary.Infra
         }
 
         public bool AddFinanceOperation(string date, OperationType operationType, int amount,
-            OperationKind operationKind, string reason)
+            IEnumerable<OperationKind> operationKinds, string reason)
         {
             try
             {
                 FinanceOperation financeOperation = mOperationsFactory.CreateFinanceOperation(
-                    date, operationType, amount, operationKind, reason);
+                    date, operationType, amount, operationKinds, reason);
 
                 UpdateDefaultCashRegister(financeOperation);
 

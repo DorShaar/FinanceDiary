@@ -27,7 +27,7 @@ namespace FinanceDiary.Domain.Database
 
             using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
 
-            await csvWriterAdapter.Write(cashRegisters);
+            await csvWriterAdapter.Write(cashRegisters).ConfigureAwait(false);
         }
 
         public async Task SaveFinanceOperationsToCsv(IEnumerable<FinanceOperation> financeOperations)
@@ -36,7 +36,7 @@ namespace FinanceDiary.Domain.Database
 
             using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
 
-            await csvWriterAdapter.Write(financeOperations);
+            await csvWriterAdapter.Write(financeOperations).ConfigureAwait(false);
         }
 
         public async Task SaveNeutralOperationsToCsv(IEnumerable<NeutralOperation> neutralOperations)
@@ -45,7 +45,7 @@ namespace FinanceDiary.Domain.Database
 
             using CsvWriterAdapter csvWriterAdapter = new CsvWriterAdapter(csvPath);
 
-            await csvWriterAdapter.Write(neutralOperations);
+            await csvWriterAdapter.Write(neutralOperations).ConfigureAwait(false);
         }
 
         public List<CashRegister> LoadCashRegistersFromCsv()
@@ -60,7 +60,7 @@ namespace FinanceDiary.Domain.Database
             while (csvReaderAdapter.CsvReader.Read())
             {
                 CashRegister cashRegister = new CashRegister(
-                    csvReaderAdapter.CsvReader.GetField("Name"), 
+                    csvReaderAdapter.CsvReader.GetField("Name"),
                     csvReaderAdapter.CsvReader.GetField<int>("CurrentAmount"));
                 cashRegisters.Add(cashRegister);
             }
@@ -79,12 +79,19 @@ namespace FinanceDiary.Domain.Database
             csvReaderAdapter.CsvReader.ReadHeader();
             while (csvReaderAdapter.CsvReader.Read())
             {
+                OperationKind[] operationKinds = new OperationKind[3]
+                {
+                    csvReaderAdapter.CsvReader.GetField<OperationKind>("OperationKind1"),
+                    csvReaderAdapter.CsvReader.GetField<OperationKind>("OperationKind2"),
+                    csvReaderAdapter.CsvReader.GetField<OperationKind>("OperationKind3"),
+                };
+
                 FinanceOperation financeOperation = new FinanceOperation(
-                    csvReaderAdapter.CsvReader.GetField("Id"), 
+                    csvReaderAdapter.CsvReader.GetField("Id"),
                     csvReaderAdapter.CsvReader.GetField("Date"),
                     csvReaderAdapter.CsvReader.GetField<OperationType>("OperationType"),
                     csvReaderAdapter.CsvReader.GetField<int>("Amount"),
-                    csvReaderAdapter.CsvReader.GetField<OperationKind>("OperationKind"),
+                    operationKinds,
                     csvReaderAdapter.CsvReader.GetField("Reason"));
 
                 financeOperations.Add(financeOperation);

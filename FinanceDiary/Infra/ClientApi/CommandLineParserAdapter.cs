@@ -1,8 +1,10 @@
 ﻿using CommandLine;
+using ConsoleTables;
 using FinanceDiary.App;
 using FinanceDiary.Domain.FinanceOperations;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace FinanceDiary.Infra.ClientApi
 {
@@ -48,7 +50,7 @@ namespace FinanceDiary.Infra.ClientApi
                 options.Date,
                 OperationType.Deposit,
                 options.Amount,
-                (OperationKind)options.Kind,
+                new List<OperationKind> { (OperationKind)options.Kind },
                 options.Reason))
             {
                 mLogger.LogWarning($"Deposit operation of {options.Amount} at {options.Date} of kind {options.Kind} " +
@@ -56,6 +58,16 @@ namespace FinanceDiary.Infra.ClientApi
                 return 1;
             }
 
+            return 0;
+        }
+
+        private int Print()
+        {
+            ConsoleTable consoleTable = new ConsoleTable("1", "2", "3");
+            consoleTable.AddRow("abc", "cfg", "dfdf");
+            consoleTable.AddRow("ab555c", "cf3434g", "dfd2131231");
+
+            consoleTable.Write(Format.Alternative);
             return 0;
         }
     }
