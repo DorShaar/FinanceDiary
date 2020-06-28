@@ -132,7 +132,7 @@ namespace FinanceDiary.TestsUnit.Domain.Database
                 HashSet<CashRegister> cashRegisters = new HashSet<CashRegister>()
                 {
                     cashRegister,
-                    new CashRegister("cash2"),
+                    new CashRegister("cash2", 200),
                 };
 
                 await financeDiaryDatabase.SaveCashRegistersToCsv(cashRegisters).ConfigureAwait(false);
@@ -141,9 +141,9 @@ namespace FinanceDiary.TestsUnit.Domain.Database
                 List<CashRegister> cashRegistersList = cashRegisters.ToList();
 
                 Assert.Equal(loadedCashRegisters[0].Name, cashRegistersList[0].Name);
-                Assert.Equal(loadedCashRegisters[0].CurrentAmount, cashRegistersList[0].CurrentAmount);
+                Assert.Equal(loadedCashRegisters[0].InitialAmount, cashRegistersList[0].InitialAmount);
                 Assert.Equal(loadedCashRegisters[1].Name, cashRegistersList[1].Name);
-                Assert.Equal(loadedCashRegisters[1].CurrentAmount, cashRegistersList[1].CurrentAmount);
+                Assert.Equal(loadedCashRegisters[1].InitialAmount, cashRegistersList[1].InitialAmount);
             }
             finally
             {

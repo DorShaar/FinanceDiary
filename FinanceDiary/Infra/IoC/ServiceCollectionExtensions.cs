@@ -4,6 +4,7 @@ using FinanceDiary.Domain.FinanceOperations;
 using FinanceDiary.Domain.IdGenerators;
 using FinanceDiary.Domain.Options;
 using FinanceDiary.Infra.ClientApi;
+using FinanceDiary.Infra.CommandParsers;
 using FinanceDiary.Infra.HostedServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace FinanceDiary.Infra.IoC
             serviceCollection.AddSingleton<IIdGenerator, IdGenerator>();
             serviceCollection.AddSingleton<IFinanceDiaryDatabase, FinanceDiaryDatabase>();
             serviceCollection.AddSingleton<ICommandLineRunner, CommandLineParserAdapter>();
+            serviceCollection.AddSingleton<ICommandParser, CommandParser>();
 
             // Binds between IConfiguration to DatabaseConfigurtaion.
             serviceCollection.Configure<DatabaseConfiguration>(configuration);

@@ -18,8 +18,8 @@ namespace FinanceDiary.Infra
         private readonly IFinanceDiaryDatabase mFinanceDiaryDatabase;
         private readonly ILogger<FinanceDiaryManager> mLogger;
 
-        private const string DefaultAccountName = "Default Account";
-        private readonly CashRegister DefaultCacheRegister;
+        private const string DefaultAccountName = "Default_Account";
+        private CashRegister DefaultCacheRegister;
         private HashSet<CashRegister> mCashRegisters;
         private List<FinanceOperation> mFinanceOperations;
         private List<NeutralOperation> mNeutralOperations;
@@ -34,7 +34,6 @@ namespace FinanceDiary.Infra
             mLogger = logger;
 
             LoadFromDatabase().Wait();
-            DefaultCacheRegister = mCashRegisters.First(cash => cash.Name.Equals(DefaultAccountName));
         }
 
         public IEnumerable<CashRegister> GetAllCashRegisters()
@@ -169,14 +168,31 @@ namespace FinanceDiary.Infra
 
         private Task LoadFromDatabase()
         {
-            List<CashRegister> cashRegisters = mFinanceDiaryDatabase.LoadCashRegistersFromCsv().ToList();
-            mCashRegisters = cashRegisters.ToHashSet(new CashRegisterComparer());
-
             mFinanceOperations = mFinanceDiaryDatabase.LoadFinanceOperationsFromCsv().ToList();
 
             mNeutralOperations = mFinanceDiaryDatabase.LoadNeutralOperationsFromCsv().ToList();
 
+            List<CashRegister> cashRegisters = mFinanceDiaryDatabase.LoadCashRegistersFromCsv().ToList();
+            mCashRegisters = cashRegisters.ToHashSet(new CashRegisterComparer());
+
+            DefaultCacheRegister = mCashRegisters.First(cash => cash.Name.Equals(DefaultAccountName));
+
+            UpdateCashRegistersAfterLoad();
+
             return Task.CompletedTask;
+        }
+
+        private void UpdateCashRegistersAfterLoad()
+        {
+            foreach(FinanceOperation financeOperation in mFinanceOperations)
+            {
+                UpdateDefaultCashRegister(financeOperation);
+            }
+
+            foreach(NeutralOperation neutralOperation in mNeutralOperations)
+            {
+                UpdateCashRegisters(neutralOperation);
+            }
         }
     }
 }

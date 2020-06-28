@@ -5,23 +5,17 @@ namespace FinanceDiary.Domain.CashRegisters
     public class CashRegister
     {
         public string Name { get; }
+        public int InitialAmount { get; }
         public int CurrentAmount { get; private set; }
 
-        public CashRegister(string name)
+        public CashRegister(string name, int initialAmount = 0)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException($"{nameof(name)}");
 
             Name = name;
-        }
-
-        internal CashRegister(string name, int currentAmount)
-        {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentException($"{nameof(name)}");
-
-            Name = name;
-            CurrentAmount = currentAmount;
+            InitialAmount = initialAmount;
+            CurrentAmount = initialAmount;
         }
 
         public void Deposit(int amount)

@@ -48,7 +48,7 @@ namespace FinanceDiary.Infra.ClientApi
             [Option('s', "source", HelpText = "Source cash register", Required = true)]
             public string SourceCashRegister { get; set; }
 
-            [Option('d', "dest", HelpText = "Destination cash register", Required = true)]
+            [Option('t', "dest", HelpText = "Destination cash register", Required = true)]
             public string DestinationCashRegister { get; set; }
 
             [Option('r', "reason", HelpText = "Operation kind", Required = true)]

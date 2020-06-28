@@ -1,7 +1,9 @@
 ﻿using FinanceDiary.Infra.ClientApi;
+using FinanceDiary.Infra.CommandParsers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,11 +12,15 @@ namespace FinanceDiary.Infra.HostedServices
     public class FinanceDiaryHostedService : IHostedService
     {
         private readonly ICommandLineRunner mCommandLineRunner;
+        private readonly ICommandParser mCommandParser;
         private readonly ILogger<FinanceDiaryHostedService> mLogger;
 
-        public FinanceDiaryHostedService(ICommandLineRunner commandLineRunner, ILogger<FinanceDiaryHostedService> logger)
+        public FinanceDiaryHostedService(ICommandLineRunner commandLineRunner,
+            ICommandParser commandParser,
+            ILogger<FinanceDiaryHostedService> logger)
         {
             mCommandLineRunner = commandLineRunner;
+            mCommandParser = commandParser;
             mLogger = logger;
         }
 
@@ -26,7 +32,7 @@ namespace FinanceDiary.Infra.HostedServices
 
             while (!ShouldExit(userInput))
             {
-                mCommandLineRunner.RunCommand(userInput.Split(" "));
+                mCommandLineRunner.RunCommand(mCommandParser.Parse(userInput));
                 userInput = Console.ReadLine();
             }
                 

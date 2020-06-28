@@ -61,7 +61,7 @@ namespace FinanceDiary.Domain.Database
             {
                 CashRegister cashRegister = new CashRegister(
                     csvReaderAdapter.CsvReader.GetField("Name"),
-                    csvReaderAdapter.CsvReader.GetField<int>("CurrentAmount"));
+                    csvReaderAdapter.CsvReader.GetField<int>("InitialAmount"));
                 cashRegisters.Add(cashRegister);
             }
 

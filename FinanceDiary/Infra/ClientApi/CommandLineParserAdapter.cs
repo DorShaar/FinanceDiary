@@ -179,15 +179,20 @@ namespace FinanceDiary.Infra.ClientApi
         {
             IEnumerable<CashRegister> cashRegisters = mFinanceDiaryManager.GetAllCashRegisters();
 
-            ConsoleTable consoleTable = new ConsoleTable(cashRegisters.Select(cash => cash.Name).ToArray());
+            string[] columnsHeaders = cashRegisters.Select(cash => cash.Name).Append("Total").ToArray();
+            ConsoleTable consoleTable = new ConsoleTable(columnsHeaders);
 
             int[] amounts = cashRegisters.Select(cash => cash.CurrentAmount).ToArray();
-            object[] amountsObject = new object[amounts.Length];
+            object[] amountsObject = new object[columnsHeaders.Length];
 
+            int total = 0;
             for(int i = 0; i < amounts.Length; ++i)
             {
+                total += amounts[i];
                 amountsObject[i] = amounts[i];
             }
+
+            amountsObject[columnsHeaders.Length - 1] = total;
 
             consoleTable.AddRow(amountsObject);
 

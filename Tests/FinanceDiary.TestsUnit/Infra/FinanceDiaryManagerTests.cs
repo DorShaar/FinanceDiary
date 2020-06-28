@@ -16,7 +16,7 @@ namespace FinanceDiary.TestsUnit.Infra
 {
     public class FinanceDiaryManagerTests
     {
-        private const string DefaultCashRegisterName = "Default Account";
+        private const string DefaultCashRegisterName = "Default_Account";
         private readonly IFinanceDiaryDatabase mFinanceDiaryDatabase = A.Fake<IFinanceDiaryDatabase>();
 
         public FinanceDiaryManagerTests()
@@ -47,7 +47,7 @@ namespace FinanceDiary.TestsUnit.Infra
                 NullLogger<FinanceDiaryManager>.Instance);
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
-            Assert.False(financeDiaryManager.AddCashRegister("Default Account"));
+            Assert.False(financeDiaryManager.AddCashRegister("Default_Account"));
 
             Assert.Single(financeDiaryManager.GetAllCashRegisters());
         }
