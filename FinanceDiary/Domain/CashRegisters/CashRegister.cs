@@ -8,6 +8,13 @@ namespace FinanceDiary.Domain.CashRegisters
         public int InitialAmount { get; }
         public int CurrentAmount { get; private set; }
 
+        private CashRegister(string name, int initialAmount, int currentAmount)
+        {
+            Name = name;
+            InitialAmount = initialAmount;
+            CurrentAmount = currentAmount;
+        }
+
         public CashRegister(string name, int initialAmount = 0)
         {
             if (string.IsNullOrEmpty(name))
@@ -16,6 +23,11 @@ namespace FinanceDiary.Domain.CashRegisters
             Name = name;
             InitialAmount = initialAmount;
             CurrentAmount = initialAmount;
+        }
+
+        public CashRegister CreateCopy()
+        {
+            return new CashRegister(Name,InitialAmount, CurrentAmount);
         }
 
         public void Deposit(int amount)

@@ -70,6 +70,9 @@ namespace FinanceDiary.Infra.ClientApi
         {
             [Value(0, HelpText = "Object type (cash-register, report)")]
             public string ObjectType { get; set; }
+
+            [Option('s', "Since", HelpText = "get reoprt of the last given time (m, y). Example of last two months: -s 2m", Required = false)]
+            public string Since { get; set; }
         }
 
         [Verb("save", HelpText = "save database")]

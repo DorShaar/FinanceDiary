@@ -38,12 +38,19 @@ namespace FinanceDiary.Infra
 
         public IEnumerable<CashRegister> GetAllCashRegisters()
         {
-            return mCashRegisters.ToImmutableArray();
+            return mCashRegisters.ToImmutableHashSet();
         }
 
         public FinanceReport GetReport()
         {
-            return new FinanceReport(mCashRegisters, mFinanceOperations, mNeutralOperations);
+            HashSet<CashRegister> cashRegisters = new HashSet<CashRegister>(mCashRegisters.Count, new CashRegisterComparer());
+
+            foreach(CashRegister cashRegister in mCashRegisters)
+            {
+                cashRegisters.Add(cashRegister.CreateCopy());
+            }
+
+            return new FinanceReport(cashRegisters, mFinanceOperations, mNeutralOperations);
         }
 
         public bool AddCashRegister(string cachRegisterName, int initialAmount = 0)

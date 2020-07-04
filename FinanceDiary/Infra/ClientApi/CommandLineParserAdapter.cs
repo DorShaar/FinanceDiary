@@ -2,12 +2,12 @@
 using ConsoleTables;
 using FinanceDiary.App;
 using FinanceDiary.Domain.CashRegisters;
+using FinanceDiary.Domain.ConsoleTableAdapters;
 using FinanceDiary.Domain.FinanceOperations;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace FinanceDiary.Infra.ClientApi
 {
@@ -103,7 +103,7 @@ namespace FinanceDiary.Infra.ClientApi
                     operationKinds.Add((OperationKind)Enum.Parse(typeof(OperationKind), kind));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 mLogger.LogWarning(ex, "Could not parse operation kind strings");
                 return new List<OperationKind>();
@@ -154,6 +154,12 @@ namespace FinanceDiary.Infra.ClientApi
                     return 0;
                 }
 
+                if (IsReferringReport(options.ObjectType))
+                {
+                    PrintReportSince(options.Since);
+                    return 0;
+                }
+
                 mLogger.LogWarning($"Object type {options.ObjectType} did not matched");
                 return 1;
             }
@@ -172,6 +178,7 @@ namespace FinanceDiary.Infra.ClientApi
                 lowerUserInput.Equals("cash-register") ||
                 lowerUserInput.Equals("cash register") ||
                 lowerUserInput.Equals("register") ||
+                lowerUserInput.Equals("registers") ||
                 lowerUserInput.Equals("status");
         }
 
@@ -179,29 +186,54 @@ namespace FinanceDiary.Infra.ClientApi
         {
             IEnumerable<CashRegister> cashRegisters = mFinanceDiaryManager.GetAllCashRegisters();
 
-            string[] columnsHeaders = cashRegisters.Select(cash => cash.Name).Append("Total").ToArray();
-            ConsoleTable consoleTable = new ConsoleTable(columnsHeaders);
+            ConsoleTableAdapter.PrintCashRegisterStatus(cashRegisters);
+        }
 
-            int[] amounts = cashRegisters.Select(cash => cash.CurrentAmount).ToArray();
-            object[] amountsObject = new object[columnsHeaders.Length];
+        private bool IsReferringReport(string userInput)
+        {
+            string lowerUserInput = userInput.ToLowerInvariant();
+            return
+                lowerUserInput.Equals("report") ||
+                lowerUserInput.Equals("reports");
+        }
 
-            int total = 0;
-            for(int i = 0; i < amounts.Length; ++i)
+        private void PrintReportSince(string since)
+        {
+            ConsoleTableAdapter.PrintReportSince(mFinanceDiaryManager.GetReport(), CalculateDateTimeSince(since));
+        }
+
+        private DateTime CalculateDateTimeSince(string since)
+        {
+            if (string.IsNullOrEmpty(since))
+                return default;
+
+            int timeNumber;
+
+            char firstLetter = since.FirstOrDefault(ch => char.IsLetter(ch));
+
+            if (firstLetter == default)
             {
-                total += amounts[i];
-                amountsObject[i] = amounts[i];
+                timeNumber = int.Parse(since);
+                return DateTime.Now.AddMonths(-timeNumber);
             }
 
-            amountsObject[columnsHeaders.Length - 1] = total;
+            int firstLetterIndex = since.IndexOf(firstLetter);
+            string timeNumberStr = since.Substring(0, firstLetterIndex);
+            timeNumber = int.Parse(timeNumberStr);
 
-            consoleTable.AddRow(amountsObject);
+            char timeType = since[firstLetterIndex];
 
-            consoleTable.Write(Format.Alternative);
+            if (timeType.Equals('m'))
+                return DateTime.Now.AddMonths(-timeNumber);
+            if (timeType.Equals('y'))
+                return DateTime.Now.AddYears(-timeNumber);
+
+            throw new ArgumentException($"Could not parse paramter {nameof(since)}: {since}");
         }
 
         private int Save(CommandLineOptions.SaveOptions _)
         {
-            mFinanceDiaryManager.SaveToDatabase();
+            mFinanceDiaryManager.SaveToDatabase().Wait();
 
             return 0;
         }
